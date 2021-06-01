@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const PinSchema = new mongoose.Schema({
   name: String,
   urlImg: String,
+  subTitle: String,
 });
 
 const PinModel = mongoose.model("pins", PinSchema);

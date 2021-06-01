@@ -4,12 +4,15 @@ const morgan = require("morgan");
 const cors = require("cors");
 const path = require("path");
 const pins = require("./src/pins/pins.router");
+const users = require("./src/user/users.router");
+const auth = require("./src/auth/auth.router");
+require('dotenv').config();
 
 const mongoose = require("mongoose");
 
 const options = { useNewUrlParser: true, useUnifiedTopology: true };
 const mongo = mongoose.connect(
-  "mongodb://mongoadmin:secret@localhost:27017",
+  process.env.DB_HOST,
   options
 );
 
@@ -20,6 +23,10 @@ mongo.then(() => {
 global.appRoot = path.resolve(__dirname);
 const app = express();
 
+app.use("/pins", pins);
+app.use("/users", users);
+app.use("/auth", auth);
+
 app.use(cors());
 app.use(json());
 app.use(urlencoded({ extended: true }));
@@ -27,11 +34,13 @@ app.use(morgan("dev"));
 app.disable("x-powered-by Nuclio");
 
 app.use("/pins", pins);
+app.use("/users", users);
+app.use("/auth", auth);
 
 const start = async () => {
   try {
-    app.listen(5001, () => {
-      console.log(`REST API on http://localhost:5001/`);
+    app.listen(5000, () => {
+      console.log(`REST API on http://localhost:5000/`);
     });
   } catch (e) {
     console.error(e);
