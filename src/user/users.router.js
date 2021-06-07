@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const usersController = require("./users.controller");
 const jwt = require("jsonwebtoken");
+const { body } = require('express-validator');
 
 const middleware = async (req, res, next) => {
     if (!req.headers.authorization) {
@@ -21,7 +22,10 @@ const middleware = async (req, res, next) => {
 
 router.route("/")
     .get(middleware, usersController.all)
-    .post(usersController.create);
+    .post(
+        body('email').isEmail(),
+        body('password').isLength({ min: 6 }),
+        usersController.create);
 
 router.route("/:id")
     .get(usersController.get)

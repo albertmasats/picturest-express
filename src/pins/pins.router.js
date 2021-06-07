@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const pinsController = require("./pins.controller");
 const jwt = require("jsonwebtoken");
+const { body } = require('express-validator');
 
 const middleware = async (req, res, next) => {
     if (!req.headers.authorization) {
@@ -21,11 +22,16 @@ const middleware = async (req, res, next) => {
 
 router.route("/")
     .get(pinsController.all)
-    .post(middleware, pinsController.create);
+    .post(middleware,
+        body('imgUrl').isURL(),
+        pinsController.create);
 
 router.route("/:id")
     .get(pinsController.get)
     .delete(pinsController.remove)
     .put(pinsController.update);
+
+router.route("/search/:text")
+    .get(pinsController.search);
 
 module.exports = router;

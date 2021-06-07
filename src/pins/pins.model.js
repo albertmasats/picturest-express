@@ -19,7 +19,12 @@ const getAll = async () => {
     return pins;
 };
 
+const search = async (query) => {
+    return await PinModel.find(query);
+};
+
 module.exports = {
     create,
     getAll,
+    search
 };

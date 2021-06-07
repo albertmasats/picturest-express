@@ -1,6 +1,7 @@
 const userModel = require("./users.model");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { validationResult } = require('express-validator');
 
 const all = async (req, res) => {
   const users = await userModel.getAll();
@@ -8,8 +9,12 @@ const all = async (req, res) => {
 };
 
 const create = async (req, res) => {
-  const salt = bcrypt.genSaltSync(10);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
+  const salt = bcrypt.genSaltSync(10);
   const user = await userModel.create({
     email: req.body.email,
     name: req.body.name,
@@ -17,7 +22,6 @@ const create = async (req, res) => {
   });
 
   const token = jwt.sign({id: user._id}, process.env.TOKEN_SECRET);
-
   res.status(201).json(token);
 };
 

@@ -1,5 +1,6 @@
 const pinModel = require("./pins.model");
 const jwt = require("jsonwebtoken");
+const { validationResult } = require('express-validator');
 
 const all = async (req, res) => {
     const pins = await pinModel.getAll();
@@ -7,6 +8,11 @@ const all = async (req, res) => {
 };
 
 const create = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const token = req.headers.authorization.split(" ")[1];
     const tokenDecoded = jwt.decode(token);
 
@@ -16,6 +22,12 @@ const create = async (req, res) => {
     });
 
     res.status(201).json(pin);
+};
+
+const search = async (req, res) => {
+    const text = req.params.text;
+    const filteredPins = await pinModel.search({ name: {'$regex' : text, '$options' : 'i'} });
+    res.json(filteredPins);
 };
 
 const get = async (req, res) => {
@@ -33,4 +45,5 @@ module.exports = {
     get,
     update,
     remove,
+    search
 };
