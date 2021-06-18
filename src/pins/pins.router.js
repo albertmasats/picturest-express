@@ -1,37 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const pinsController = require("./pins.controller");
-const jwt = require("jsonwebtoken");
-const { body } = require('express-validator');
+const { body } = require("express-validator");
+const { requireAuthMiddleware } = require("../auth/middleware");
 
-const middleware = async (req, res, next) => {
-    if (!req.headers.authorization) {
-        return res.status(401).json("Forbidden.");
-    }
+router
+  .route("/")
+  .get(pinsController.all)
+  .post(requireAuthMiddleware, body("urlImage").isURL(), pinsController.create);
 
-    const token = req.headers.authorization.split(' ')[1];
+router
+  .route("/:id")
+  .get(pinsController.get)
+  .delete(requireAuthMiddleware, pinsController.remove)
+  .put(requireAuthMiddleware, pinsController.update);
 
-    jwt.verify(token, process.env.TOKEN_SECRET, (err) => {
-        if (err) {
-            return res.status(401).json(err)
-        }
-
-        return next();
-    });
-}
-
-router.route("/")
-    .get(pinsController.all)
-    .post(middleware,
-        body('imgUrl').isURL(),
-        pinsController.create);
-
-router.route("/:id")
-    .get(pinsController.get)
-    .delete(pinsController.remove)
-    .put(pinsController.update);
-
-router.route("/search/:text")
-    .get(pinsController.search);
+router.route("/search/:text").get(pinsController.search);
 
 module.exports = router;

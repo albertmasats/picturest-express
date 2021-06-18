@@ -1,10 +1,11 @@
-const pinModel = require("./pins.model");
+const boardModel = require("./boards.model");
+const pinModel = require("../pins/pins.model");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 
 const all = async (req, res) => {
-  const pins = await pinModel.getAll();
-  res.json(pins);
+  const boards = await boardModel.getAll();
+  res.json(boards);
 };
 
 const create = async (req, res) => {
@@ -16,20 +17,27 @@ const create = async (req, res) => {
   const token = req.headers.authorization.split(" ")[1];
   const tokenDecoded = jwt.decode(token);
 
-  const pin = await pinModel.create({
+  const board = await boardModel.create({
     ...req.body,
     author: tokenDecoded.id,
   });
 
-  res.status(201).json(pin);
+  res.status(201).json(board);
 };
 
 const search = async (req, res) => {
   const text = req.params.text;
-  const filteredPins = await pinModel.search({
+  const filteredboards = await pinModel.search({
     name: { $regex: text, $options: "i" },
   });
-  res.json(filteredPins);
+  res.json(filteredboards);
+};
+
+const getPinsOfBoard = async (req, res) => {
+  const pins = await pinModel.search({
+    boards: { $elemMatch: { $eq: req.params.id } },
+  });
+  res.json(pins);
 };
 
 const get = async (req, res) => {};
@@ -45,4 +53,5 @@ module.exports = {
   update,
   remove,
   search,
+  getPinsOfBoard,
 };

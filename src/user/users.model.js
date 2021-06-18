@@ -1,13 +1,21 @@
 const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema({
-  name: String,
+  firstName: String,
+  lastName: String,
   email: String,
+  avatar: String,
   password: String,
-  pins: Array,
+  username: String,
+  following: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserModel",
+    },
+  ],
 });
 
-const UserModel = mongoose.model("users", UserSchema);
+const UserModel = mongoose.model("UserModel", UserSchema);
 
 const create = async (user) => {
   const userCreated = await UserModel.create(user);
@@ -22,11 +30,11 @@ const getAll = async () => {
 const search = async (query) => {
   const user = await UserModel.findOne(query);
   return user;
-}
+};
 
 const getOne = async (id) => {
-    const user = await UserModel.findById(id);
-    return user;
+  const user = await UserModel.findById(id);
+  return user;
 };
 
 module.exports = {
