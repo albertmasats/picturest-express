@@ -10,6 +10,8 @@ const boards = require("./src/boards/boards.router");
 const auth = require("./src/auth/auth.router");
 const mongoose = require("mongoose");
 
+const PORT = process.env.PORT || 5001;
+
 const options = { useNewUrlParser: true, useUnifiedTopology: true };
 
 mongoose.connect(process.env.DB_HOST, options, () => {
@@ -33,8 +35,8 @@ app.use("/auth", auth);
 
 const start = async () => {
   try {
-    app.listen(5001, () => {
-      console.log(`REST API on http://localhost:5001/`);
+    app.listen(PORT, () => {
+      console.log(`REST API on http://localhost:${ PORT }/`);
     });
   } catch (e) {
     console.error(e);
